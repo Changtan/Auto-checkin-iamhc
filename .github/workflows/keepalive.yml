@@ -1,0 +1,29 @@
+# 保活 workflow：防止 GitHub 因仓库 60 天无动态而停用定时任务
+#
+# 使用方法：
+#   1. 把这个文件放到仓库的 .github/workflows/keepalive.yml
+#   2. 把下面 workflow_files 改成你的 workflow 实际文件名
+#      （去仓库 .github/workflows/ 目录看一眼，比如叫 iamhc.yml 就填 "iamhc.yml"，
+#       多个文件用英文逗号隔开，如 "a.yml, b.yml"）
+#   3. commit 并 push —— 这一次 push 本身就算仓库动态，60 天倒计时立即重置
+
+name: Keepalive
+
+on:
+  schedule:
+    - cron: '0 0 */14 * *'  # 每 14 天跑一次，远小于 60 天期限
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  keepalive:
+    name: Keepalive Workflow
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gautamkrishnar/keepalive-workflow@v2
+        with:
+          # ↓↓↓ 改成你的 workflow 文件名 ↓↓↓
+          workflow_files: "checkin.yml"
